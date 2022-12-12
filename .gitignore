@@ -1,1 +1,3 @@
 package.json
+build.sh
+*.log
