@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Bash error library            @version: 0.0.1
+# Bash error library            @version: 0.8.0
 # 
 # This is an example how the library can be used in an
 # script. Just source the library and setup the traps to
@@ -24,12 +24,17 @@ trap 'bs_error "$?" "${FUNCNAME[0]}"' ERR
 trap 'bs_error "$?" "${FUNCNAME[0]}"' EXIT
 trap 'bs_clean' EXIT
 
+
+############ EXAMPLES ############
+# uncomment to drop error (only one will be displayd)
+
+
 # Syntax error -> nothing in function
-hello_world() {
+# hello_world() {
 
-}
+# }
 
-hello_world
+#hello_world
 
 # Unknown command or an unknown function of
 # script.
