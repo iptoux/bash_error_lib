@@ -18,6 +18,12 @@ An Package, an all in one suite, that is easy to include and use.
 ---
 An trap, set in the begin of any bash script, calls the error handler function. The function reads, validates the error, build an array that contains all needed informations for output. After that, the logger is called, than the cli output.
 
+## Control
+
+- Option to exit on error
+- Option to display source code snipped (from called error)
+- Oprion to log in an error file
+
 ## Screenshots
 ---
 - img1        # output cli
