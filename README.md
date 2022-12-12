@@ -85,9 +85,13 @@ iptoux@2040:~/gits/bash_error_lib$
 ########################################################## EXIT #######
 ```
 
+---
+
 **IMAGES**
-- img1        # output cli
-- img2        # output logfile
+
+![CLI](../assets/cli.png?raw=true)
+
+![LOG](../assets/log.png?raw=true)
 
 ## HowTo
 ---
