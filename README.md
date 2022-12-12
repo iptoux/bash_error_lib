@@ -24,8 +24,68 @@ An trap, set in the begin of any bash script, calls the error handler function. 
 - Option to display source code snipped (from called error)
 - Oprion to log in an error file
 
-## Screenshots
+## Screenshots/Output
 ---
+
+**CLI**
+```
+iptoux@2040:~/gits/bash_error_lib$ ./basherr.sh 
+
+------------------------------------------------
+
+>> ERROR (127) - Command (func) not found.
+>> -> somecommand <-
+
+>> Caused by:  Source.
+>> At file: ./basherr.sh on or near line 42
+
+>> Exit on error: true
+>> Code-snipped: true
+
+------------------------------------------------
+
+>> -> 08 lines of source from ./basherr.sh <-
+>> {
+L:38      
+L:39      # Unknown command or an unknown function of
+L:40      # script.
+L:41      
+L:42   >>>somecommand
+>> }
+
+iptoux@2040:~/gits/bash_error_lib$ 
+```
+
+**LOG**
+```
+#### + 22:53:57 + ###################### ERROR ########################
+##
+##	Exitcode: 127		|	Msg: command not found
+##
+##	>>> somecommand
+##
+##	------------------------------------------------------------
+##
+##	Call from:  Source.		|	Line: 42
+##
+##	File: ./basherr.sh
+##
+##	------------------------------------------------------------
+##
+##		>>> 08 lines of source code (snipped) <<<
+##
+## {
+##	L:38      
+##	L:39      # Unknown command or an unknown function of
+##	L:40      # script.
+##	L:41      
+##	L:42   >>>somecommand
+## }
+##
+########################################################## EXIT #######
+```
+
+**IMAGES**
 - img1        # output cli
 - img2        # output logfile
 
