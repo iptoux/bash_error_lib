@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Bash error library            @version: 0.8.0
+# Bash error library            @version: 1.0.0
 # 
 # This is an error handler for any kind of bash 
 # script. The library catches defaults script errors
