@@ -1,0 +1,256 @@
+#!/bin/bash
+#
+# Bash error library            @version: 0.0.1
+# 
+# This is an error handler for any kind of bash 
+# script. The library catches defaults script errors
+# as syntax erros by an trap and displays/logs them.
+#
+# All needed settings can be done in head of this file.
+# It is also posible to export the vars in an external
+# file, than you have to source them before this
+# library.
+#
+# For more details read&visit 
+# https://github.com/iptoux/bash_error_lib/wiki
+
+############ LIBRARY VARIABLES ############
+
+ERROR_EXIT=true
+ERROR_LOG=true
+
+ERROR_SRC_SNIPPED=true
+
+############ RUNTIME SETS ############ 
+set +o errexit  # Deactivate default Exit after first command failure.
+set -E
+
+# DATE for log file names.
+DATE=$(date +%m.%d.%y)
+
+LOG_DIR=""
+ERROR_FILE=${LOG_DIR}${DATE}'_error.log'
+
+# Redirect stderr to file for parsing errors....
+exec 2> 'stderr'
+
+############ HANDLER VARS/SETS ############
+declare -A eout
+declare -A ECD
+
+ECD[1]="General script error."
+ECD[2]="Bash script error."
+ECD[126]="Command invoked cannot be exec."
+ECD[127]="Command (func) not found."
+ECD[128]="Invalid argument to exit."
+ECD[130]="Script terminated by Control-C."
+
+
+######################## BEGIN OF LIBRARY ########################
+##################################################################
+############ DONT ############ EDIT ############ HERE ############
+##################################################################
+
+unset eout
+
+# Bash error logging, the output printed in an error log file.
+# This function builds the style of the log entry. Variables are stored
+# global in eout[@]
+bs_error_log() {
+
+    # check if logging of errors in enabled.
+    if [ "${ERROR_LOG}" == true ]; then
+
+        # part of theme (line-split)
+        lsp="##\n"
+
+        # generate head
+        emsg_head="\n#### + ${eout[0]} + ###################### ERROR ######################${lsp}"
+        emsg_head+="${lsp}"
+        
+        # generate body
+        emsg_body="##\tExitcode: ${eout[1]}\t\t|\tMsg:${eout[2]}\n"
+        emsg_body+="${lsp}##\t>>>${eout[3]}\n"
+        emsg_body+="${lsp}##\t------------------------------------------------------------\n"
+        emsg_body+="${lsp}##\tCall from: ${eout[4]}\t\t|\tLine: ${eout[6]}\n"
+        emsg_body+="${lsp}##\tFile: ${eout[5]}\n"
+
+        # show source file output on failed line?
+        # if yes, new split, else go to footer.
+
+            if [ "${ERROR_SRC_SNIPPED}" == true ]; then
+                # add output
+                eded="${lsp}##\t------------------------------------------------------------\n"
+                eded+="${lsp}##\t\t>>> 08 lines of source code (snipped) <<<\n"
+                eded+="${lsp}## {\n"
+
+                regfile=${eout[5]}
+
+                regex=$(awk 'NR>L-5 && NR<L+5 { printf "##\tL:%-5d%3s%s\n",NR,(NR==L?">>>":""),$regfile }' L="${eout[6]}" "${eout[5]}")
+                
+                eded+="${regex}\n## }\n"
+
+                emsg_body+="${eded}"
+            fi
+
+        # generate footer
+
+        if [ "${ERROR_EXIT}" == false ] && [ "${eout[7]}" == false ]; then
+            emsg_footer+="${lsp}################################################# SKIP ERROR #####${lsp}"    
+            else
+            emsg_footer+="${lsp}########################################################## EXIT #####${lsp}"
+        fi
+
+        # combine head+body+footer to one var
+        emsg="${emsg_head}${emsg_body}${emsg_footer}"
+
+        echo -e "${emsg}" >> "${ERROR_FILE}"
+        return 0
+    fi
+}
+
+bs_error_cli() {
+
+    clierrout="\n------------------------------------------------\n"
+
+    # Generate cli output, building head
+    if ! [ -n "${eout[2]}" ]; then
+            eout[2]=${eout[3]}
+            clierrout+="\n>> ERROR (${eout[1]}) - ${ECD[2]}\n"
+    else
+        clierrout+="\n>> ERROR (${eout[1]}) - ${ECD[${eout[1]}]}\n"
+    fi
+    
+    # Building body
+    clierrout+=">> ->${eout[3]} <-\n"
+    clierrout+="\n>> Caused by: ${eout[4]}\n"
+    clierrout+=">> At file: ${eout[5]} on or near line ${eout[6]}\n"
+    #clierrout+=">> In: ${eout[4]}\n"
+
+    if  [ "${eout[7]}" == true ]; then
+        clierrout+="\n>> Exit on error: (auto) default\n"
+    else
+        clierrout+="\n>> Exit on error: ${ERROR_EXIT}\n"
+    fi
+
+    clierrout+=">> Code-snipped: ${ERROR_SRC_SNIPPED}\n"
+
+    # Check if file source snipped should be displayd
+    if [ "${ERROR_SRC_SNIPPED}" == true ]; then
+        if [ "${ERROR_EXIT}" == true ]; then
+
+            clierrout+="\n------------------------------------------------\n"
+            clierrout+="\n>> -> 08 lines of source from ${eout[5]} <-\n"
+            
+            clierrout+=">> {\n"
+
+            regfile=${eout[5]}
+            regex=$(awk 'NR>L-5 && NR<L+5 { printf "L:%-5d%3s%s\n",NR,(NR==L?">>>":""),$regfile }' L="${eout[6]}" "${eout[5]}")
+                    
+            clierrout+="${regex}\n>> }\n"
+        else
+            clierrout+="\nSet EXIT on Error to show!\n"
+        fi
+    fi
+
+    # Actual push to stdrout
+    echo -e "${clierrout}"
+
+    return 0
+
+}
+
+# Bash error library handler
+# This is an own self written error handler, to handle function
+# and command errors during the runtime/developemnt.
+#
+# It uses an typical trap, but can also display simple user
+# error messages. These messages have to be piped.
+# 
+# Errors will logged in an file if enabled.
+#
+# @param $errmsg | @output err
+bs_error() {
+
+    # check if function called by trap or pipe
+    if [ -n "$1" ]; then
+           set +u
+        # checks if function is called by an error.
+        if [[ $1 -gt 0 ]] && [ -f 'stderr' ]; then
+            
+            # Store time of error in variable
+            err_time=$(date "+%H:%M:%S")
+
+            # get error code/func from call/arg
+            error_code="$1"
+
+            error_func="$2"
+
+             if [ "$2" == "" ]; then
+                if [[ ${error_code} -eq 2 ]]; then
+                    error_func=" Syntax error."
+                else
+                    error_func=" Source."
+                fi
+             fi
+
+            # read error from file (set in setup.sh via exec 3> stderr;exec 2>&3)
+            IFS=':' read -ra err_array < 'stderr'
+
+                error_source=${err_array[0]}
+                error_line=${err_array[1]##* }
+                error_cmd=${err_array[2]}
+                error_code_desc=${err_array[3]}
+
+            #echo "${err_array[@]}"
+
+            if [[ "$1" -eq "2" ]]; then
+                ERROR_EXIT=true
+            fi
+
+            #delete tmp_err file
+            rm 'stderr'
+            
+            
+            
+            # store all in an array to build variable out messages.
+            eout[0]=${err_time}
+            eout[1]=${error_code}
+            eout[2]=${error_code_desc}
+            eout[3]=${error_cmd}
+            eout[4]=${error_func}
+            eout[5]=${error_source}
+            eout[6]=${error_line}
+            eout[7]=false
+
+            # error in bash script, needed when no exit trap 
+            # is used to catch errors.
+            if [[ "$1" -eq "2" ]]; then
+                eout[7]=true
+            fi
+
+            # logging error to logfile (if true)
+            bs_error_log 
+
+            # show error on cli
+            bs_error_cli
+
+            if [ "${ERROR_EXIT}" == true ] || [ "${eout[7]}" == true ]; then
+                exit 0
+            fi
+
+        fi
+    else
+        # function called by pipe
+        echo "pipe"
+    fi
+    set -u
+}
+
+bs_clean() {
+    if [ -f 'stderr' ]; then
+        rm 'stderr'
+        return
+    fi
+    return 0
+}
