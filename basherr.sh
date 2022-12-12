@@ -16,7 +16,7 @@
 
 
 ############ SOURCE LIBRARY ############
-. 'lib/error'
+. 'lib/bash_error_lib'
 
 ############ LOAD TRAPS ############
 
