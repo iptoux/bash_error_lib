@@ -11,5 +11,11 @@
   "bugs": {
     "url": "https://github.com/iptoux/bash_error_lib/issues"
   },
+  "keywords": [
+    "bash",
+    "cli",
+    "error_handler",
+    "library"
+  ],
   "homepage": "https://github.com/iptoux/bash_error_lib#readme"
 }
