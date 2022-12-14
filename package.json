@@ -1,0 +1,15 @@
+{
+  "name": "bash_error_lib",
+  "version": "1.0.0",
+  "description": "bash standalone error library for your scripts.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iptoux/bash_error_lib.git"
+  },
+  "author": "Maik Roland <iptoux> Damm",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/iptoux/bash_error_lib/issues"
+  },
+  "homepage": "https://github.com/iptoux/bash_error_lib#readme"
+}
