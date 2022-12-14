@@ -160,6 +160,11 @@ bs_error_cli() {
 
 }
 
+bs_debug(){
+
+    return 0
+
+}
 # Bash error library handler
 # This is an own self written error handler, to handle function
 # and command errors during the runtime/developemnt.
