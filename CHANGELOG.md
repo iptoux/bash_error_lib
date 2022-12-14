@@ -1,3 +1,17 @@
+#### 1.0.2 (2022-12-14)
+
+##### Breaking Changes
+
+* **init:**  initialize debug func. ([a6ce4ebe](https://github.com/iptoux/bash_error_lib/commit/a6ce4ebe0e65ee3f8481c15c33a6b26f349e266a))
+
+##### Documentation Changes
+
+* **git:**  Adding keywords for readme.md ([e493bab4](https://github.com/iptoux/bash_error_lib/commit/e493bab493140a51f559e1c1cfe12d0f82879106))
+
+##### Code Style Changes
+
+* **git:**  Adding badges ([c5644209](https://github.com/iptoux/bash_error_lib/commit/c5644209b778a8d69842dfa6b768624f4bd91ea6))
+
 #### 1.0.1 (2022-12-14)
 
 ##### Build System / Dependencies
