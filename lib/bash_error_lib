@@ -22,6 +22,7 @@ ERROR_LOG=true
 ERROR_SRC_SNIPPED=true
 
 # Debug
+DEBUG_PID=$$
 DEBUG_AUTO=false
 DEBUG_OPT="-debug"
 
@@ -34,7 +35,7 @@ DATE=$(date +%m.%d.%y)
 
 LOG_DIR=""
 ERROR_FILE=${LOG_DIR}${DATE}'_error.log'
-DEBUG_FILE=${LOG_DIR}${DATE}'_debug.log'
+DEBUG_FILE=${LOG_DIR}${DATE}'_'${DEBUG_PID}'.log'
 
 # Redirect stderr to file for parsing errors....
 exec 2> 'stderr'
@@ -176,7 +177,7 @@ bs_debug() {
 
     if [ "${switch}" == "auto" ] || [ "${switch}" == true ]; then
         # open a new file descriptor for logging
-        exec 5> "${DEBUG_FILE}"
+        exec 5>> "${DEBUG_FILE}"
         # redirect trace logs to fd 5
         BASH_XTRACEFD=5
         # format output
