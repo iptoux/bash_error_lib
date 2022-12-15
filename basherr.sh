@@ -16,7 +16,10 @@
 
 
 ############ SOURCE LIBRARY ############
-. 'lib/bash_error_lib'
+. 'lib/bash_error_lib'                      # bs_debug looks for arg -$yourarg on cmd to enable it fast.
+
+# Enable Debug output.
+#bs_debug                
 
 ############ LOAD TRAPS ############
 
@@ -30,13 +33,15 @@ trap 'bs_clean' EXIT
 
 
 # Syntax error -> nothing in function
-# hello_world() {
+#hello_world() {    # <-
+#                   # <-
+#}                  # <-
+#hello_world        # <-
 
-# }
-
-#hello_world
+# Disable debug output
+#bs_debug false
 
 # Unknown command or an unknown function of
 # script.
 
-somecommand
+#somecommand        # <-
