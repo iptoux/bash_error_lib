@@ -172,28 +172,19 @@ bs_error_cli() {
 # @param bool "false"
 bs_debug() {
 
-    set +o nounset
+    switch="${1}"
 
-    if [ "$1" == false ]; then
-    
-        SDEBUG=false    
-        set +o xtrace    
-    
-    elif [ ${SDEBUG} == true ]; then
-
+    if [ "${switch}" == "auto" ] || [ "${switch}" == true ]; then
         # open a new file descriptor for logging
         exec 5> "${DEBUG_FILE}"
         # redirect trace logs to fd 5
         BASH_XTRACEFD=5
         # format output
         PS4='- [T]: $(date "+%H:%M:%S") [F]: $(basename ${BASH_SOURCE[0]}) [M]: ${FUNCNAME[0]} [L]: $LINENO [C]: '
-   
         # activate debug to file
         set -o xtrace
-
-    else
-         SDEBUG=false    
-        set +o xtrace 
+    elif [ "$1" == false ]; then
+        set +o xtrace
     fi
 
 }
@@ -293,3 +284,25 @@ bs_clean() {
     fi
     return 0
 }
+
+
+#### DONT #### EDIT #### DONT #### EDIT #### DONT #### EDIT #### DONT #### EDIT ##
+## DONT #### EDIT #### DONT #### EDIT #### DONT #### EDIT #### DONT #### EDIT #### 
+# DONT #### EDIT #### DONT #### EDIT #### DONT #### EDIT #### DONT #### EDIT ####  
+
+# Checks if debug mode is set to auto enabled or if an
+# command option (-youropt) is given on script call
+if [ ${DEBUG_AUTO} == true ]; then    
+    # call debug function
+    bs_debug auto
+else    
+    # check if arg is DEBUG_OPT
+    for i in "${@}"
+    do 
+        if [ "${i}" == "${DEBUG_OPT}" ];then    
+        # call debug function
+            bs_debug true
+        fi
+    done
+    
+fi

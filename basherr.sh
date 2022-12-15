@@ -39,8 +39,8 @@ trap 'bs_clean' EXIT
 #hello_world        # <-
 
 # Disable debug output
-#bs_debug false
-
+bs_debug false
+bs_debug true
 # Unknown command or an unknown function of
 # script.
 
