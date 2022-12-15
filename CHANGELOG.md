@@ -1,3 +1,26 @@
+### 1.1.0 (2022-12-15)
+
+##### Documentation Changes
+
+* **readme:**  Added index for better navigation. ([8fd5b186](https://github.com/iptoux/bash_error_lib/commit/8fd5b1866e3d3c0b82160be15c85b83a7767f365))
+
+##### New Features
+
+* **debug:**
+  *  New log every run. ([fae3b13a](https://github.com/iptoux/bash_error_lib/commit/fae3b13af9dc3a6fbef3d41b7e5a5f853a2553d2))
+  *  Add working function content. ([026c3774](https://github.com/iptoux/bash_error_lib/commit/026c3774c426b7561b7521170f305147d8b06a86))
+  *  Add bs_debug function in library. ([8a8b96a7](https://github.com/iptoux/bash_error_lib/commit/8a8b96a7ad4ba40fb4f0b89757d14c66a4012069))
+  *  Add bs_debug to mainscript. ([da0a4abe](https://github.com/iptoux/bash_error_lib/commit/da0a4abe332e043a6d1aa2d2b187e53d76dd5b57))
+
+##### Bug Fixes
+
+* **example:**  Add debug on/off. ([254b3ad8](https://github.com/iptoux/bash_error_lib/commit/254b3ad84df05d45cdbe361e1f5738a20e313730))
+* **readme:**  fixing link. ([446a6c43](https://github.com/iptoux/bash_error_lib/commit/446a6c4398eb5e0fa5441d65e405fab005702f83))
+
+##### Other Changes
+
+* **git:**  Adding more working files. ([e7286401](https://github.com/iptoux/bash_error_lib/commit/e72864016184e8e2eac3bb86bf5f95c865cd1f6f))
+
 #### 1.0.2 (2022-12-14)
 
 ##### Breaking Changes
