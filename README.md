@@ -78,6 +78,21 @@ L:42   >>>somecommand
 iptoux@2040:~/gits/bash_error_lib$ 
 ```
 
+```
+iptoux@2040:~/gits/bash_error_lib$ ./basherr.sh
+iptoux@2040:~/gits/bash_error_lib$ cat 12.15.22_1835637.log 
+- [T]: 22:38:47 [F]: basherr.sh [M]:  [L]: 26 [C]: trap 'bs_error "$?" "${FUNCNAME[0]}"' ERR
+- [T]: 22:38:47 [F]: basherr.sh [M]:  [L]: 27 [C]: trap 'bs_error "$?" "${FUNCNAME[0]}"' EXIT
+- [T]: 22:38:47 [F]: basherr.sh [M]:  [L]: 28 [C]: trap bs_clean EXIT
+- [T]: 22:38:47 [F]: basherr.sh [M]:  [L]: 42 [C]: bs_debug false
+- [T]: 22:38:47 [F]: bash_error_lib [M]: bs_debug [L]: 176 [C]: switch=false
+- [T]: 22:38:47 [F]: bash_error_lib [M]: bs_debug [L]: 178 [C]: '[' false == auto ']'
+- [T]: 22:38:47 [F]: bash_error_lib [M]: bs_debug [L]: 178 [C]: '[' false == true ']'
+- [T]: 22:38:47 [F]: bash_error_lib [M]: bs_debug [L]: 187 [C]: '[' false == false ']'
+- [T]: 22:38:47 [F]: bash_error_lib [M]: bs_debug [L]: 188 [C]: set +o xtrace
+iptoux@2040:~/gits/bash_error_lib$ 
+```
+
 **LOG**
 ```
 #### + 22:53:57 + ###################### ERROR ########################
@@ -151,6 +166,3 @@ Yes! thats all, now the library is ready an loaded in your script when you run i
 ## ToDo
 
 - More documentation
-- Error/bug fixing
-- Updating of some code parts
-- ++ Adding debug output/log (already done, need some review for standalone work)
