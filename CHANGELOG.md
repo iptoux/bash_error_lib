@@ -1,3 +1,9 @@
+#### 1.1.1 (2022-12-15)
+
+##### Documentation Changes
+
+* **readme:**  remove parts from todo. ([d8d1cb09](https://github.com/iptoux/bash_error_lib/commit/d8d1cb09dc038c7bd38f14ace12b2f1a31bb9dbc))
+
 ### 1.1.0 (2022-12-15)
 
 ##### Documentation Changes
