@@ -16,10 +16,14 @@
 
 ############ LIBRARY VARIABLES ############
 
+# Error
 ERROR_EXIT=true
 ERROR_LOG=true
-
 ERROR_SRC_SNIPPED=true
+
+# Debug
+DEBUG_AUTO=false
+DEBUG_OPT="-debug"
 
 ############ RUNTIME SETS ############ 
 set +o errexit  # Deactivate default Exit after first command failure.
@@ -30,6 +34,7 @@ DATE=$(date +%m.%d.%y)
 
 LOG_DIR=""
 ERROR_FILE=${LOG_DIR}${DATE}'_error.log'
+DEBUG_FILE=${LOG_DIR}${DATE}'_debug.log'
 
 # Redirect stderr to file for parsing errors....
 exec 2> 'stderr'
@@ -160,11 +165,40 @@ bs_error_cli() {
 
 }
 
-bs_debug(){
+# An simple function that handels the debug output.
+# Checks if $SDEBUG is true. When @param "false" is
+# given on call, you can disable debug mode on any file/line.
+#
+# @param bool "false"
+bs_debug() {
 
-    return 0
+    set +o nounset
+
+    if [ "$1" == false ]; then
+    
+        SDEBUG=false    
+        set +o xtrace    
+    
+    elif [ ${SDEBUG} == true ]; then
+
+        # open a new file descriptor for logging
+        exec 5> "${DEBUG_FILE}"
+        # redirect trace logs to fd 5
+        BASH_XTRACEFD=5
+        # format output
+        PS4='- [T]: $(date "+%H:%M:%S") [F]: $(basename ${BASH_SOURCE[0]}) [M]: ${FUNCNAME[0]} [L]: $LINENO [C]: '
+   
+        # activate debug to file
+        set -o xtrace
+
+    else
+         SDEBUG=false    
+        set +o xtrace 
+    fi
 
 }
+
+
 # Bash error library handler
 # This is an own self written error handler, to handle function
 # and command errors during the runtime/developemnt.
