@@ -1,6 +1,6 @@
 {
   "name": "bash_error_lib",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "bash standalone error library for your scripts.",
   "repository": {
     "type": "git",
