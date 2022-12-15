@@ -1,6 +1,28 @@
 # bash_error_lib
 
+<p align="center" width="100%">
+    <img src="https://img.shields.io/github/package-json/v/iptoux/bash_error_lib?style=flat-square" title="GitHub package.json version">
+    <img src="https://img.shields.io/github/directory-file-count/iptoux/bash_error_lib/lib?style=flat-square" title="GitHub repo file count (file extension)">
+    <img src="https://img.shields.io/github/languages/code-size/iptoux/bash_error_lib?style=flat-square" title="GitHub code size in bytes">
+    <img src="https://img.shields.io/github/issues/iptoux/bash_error_lib?style=flat-square" title="GitHub issues">
+    <img src="https://img.shields.io/github/license/iptoux/bash_error_lib?style=flat-square" title="GitHub">
+    <img src="https://img.shields.io/github/package-json/keywords/iptoux/bash_error_lib?style=flat-square" title="GitHub package.json dynamic">
+    
+</p>
+
 This is an bash error "library", an error handler for any kind of bash script. The library catches mostly all defaults script errors and syntax erros by an trap and displays/logs them.
+
+## Index
+
+
+- [Why](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#why)
+- [How it works](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#how-it-works)
+- [Control](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#control)
+- [Screenshots/Output](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#screenshotsoutput)
+- [HowTo/Usage/Install](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#howto)
+- [Example](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#example)
+- [Todo](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#todo)
+
 
 
 ## Why?
