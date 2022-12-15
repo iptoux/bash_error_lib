@@ -15,7 +15,7 @@ This is an bash error "library", an error handler for any kind of bash script. T
 ## Index
 
 
-- [Why](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#)
+- [Why](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#why)
 - [How it works](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#how-it-works)
 - [Control](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#control)
 - [Screenshots/Output](https://github.com/iptoux/bash_error_lib/tree/2-debug-output#screenshotsoutput)
