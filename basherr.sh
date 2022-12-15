@@ -19,7 +19,7 @@
 . 'lib/bash_error_lib'                      # bs_debug looks for arg -$yourarg on cmd to enable it fast.
 
 # Enable Debug output.
-#bs_debug                
+bs_debug true                               # after sourcing of lib or by commandline option (set in lib)
 
 ############ LOAD TRAPS ############
 
@@ -39,8 +39,8 @@ trap 'bs_clean' EXIT
 #hello_world        # <-
 
 # Disable debug output
-bs_debug false
-bs_debug true
+bs_debug false                              # Can be disabled at any line
+
 # Unknown command or an unknown function of
 # script.
 
