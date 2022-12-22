@@ -40,11 +40,20 @@ DEBUG_FILE=${LOG_DIR}${DATE}'_'${DEBUG_PID}'.log'
 # Redirect stderr to file for parsing errors....
 exec 2> 'stderr'
 
-############ HANDLER VARS/SETS ############
-declare -A eout
-declare -A ECD
+######################## BEGIN OF LIBRARY ########################
+##################################################################
+############ DONT ############ EDIT ############ HERE ############
+##################################################################
 
-ECD[1]="General script error."
+############ HANDLER VARS/SETS ############
+# Declaring all needed Container array's variables, lists
+declare -A TARGS                                        # ARGS FROM TRAP
+declare -gA FARGS                                       # ARGS FROME FILE
+declare -gA ECONT                                       # CONTAINER ERROR VARIABLES (MERGE)
+#declare -A eout
+declare -A BECD                                          # CONTAINER ERROR VARIABLE CODE NAMES
+
+ECD[1]="General/External script error."
 ECD[2]="Bash script error."
 ECD[126]="Command invoked cannot be exec."
 ECD[127]="Command (func) not found."
@@ -52,10 +61,7 @@ ECD[128]="Invalid argument to exit."
 ECD[130]="Script terminated by Control-C."
 
 
-######################## BEGIN OF LIBRARY ########################
-##################################################################
-############ DONT ############ EDIT ############ HERE ############
-##################################################################
+
 
 unset eout
 
@@ -203,79 +209,57 @@ bs_debug() {
 # @param $errmsg | @output err
 bs_error() {
 
-    # check if function called by trap or pipe
-    if [ -n "$1" ]; then
-           set +u
-        # checks if function is called by an error.
-        if [[ $1 -gt 0 ]] && [ -f 'stderr' ]; then
-            
-            # Store time of error in variable
-            err_time=$(date "+%H:%M:%S")
+    # oldvars, needed?
+    #err_time=$(date "+%H:%M:%S")
 
-            # get error code/func from call/arg
-            error_code="$1"
+    declare -g rerun
 
-            error_func="$2"
+    # get lenght of TARGS (for function name (4))
+    TARGS_LEN=${#*}
+    TARGS["code"]="${1}"
 
-             if [ "$2" == "" ]; then
-                if [[ ${error_code} -eq 2 ]]; then
-                    error_func=" Syntax error."
-                else
-                    error_func=" Source."
-                fi
-             fi
-
-            # read error from file (set in setup.sh via exec 3> stderr;exec 2>&3)
-            IFS=':' read -ra err_array < 'stderr'
-
-                error_source=${err_array[0]}
-                error_line=${err_array[1]##* }
-                error_cmd=${err_array[2]}
-                error_code_desc=${err_array[3]}
-
-            #echo "${err_array[@]}"
-
-            if [[ "$1" -eq "2" ]]; then
-                ERROR_EXIT=true
-            fi
-
-            #delete tmp_err file
-            rm 'stderr'
-            
-            
-            
-            # store all in an array to build variable out messages.
-            eout[0]=${err_time}
-            eout[1]=${error_code}
-            eout[2]=${error_code_desc}
-            eout[3]=${error_cmd}
-            eout[4]=${error_func}
-            eout[5]=${error_source}
-            eout[6]=${error_line}
-            eout[7]=false
-
-            # error in bash script, needed when no exit trap 
-            # is used to catch errors.
-            if [[ "$1" -eq "2" ]]; then
-                eout[7]=true
-            fi
-
-            # logging error to logfile (if true)
-            bs_error_log 
-
-            # show error on cli
-            bs_error_cli
-
-            if [ "${ERROR_EXIT}" == true ] || [ "${eout[7]}" == true ]; then
-                exit 0
-            fi
-
+        # Check if script is called by default script 
+        # exit (0) or error -> jump to cleanup if true
+        if [[ ${TARGS["code"]} -eq 0 ]] || [[ ${rerun} -eq 1 ]]; then
+            echo "Jumping to cleanUp!"
+            unset rerun
+            return 0
         fi
-    else
-        # function called by pipe
-        echo "pipe"
+
+    TARGS["file"]="${2}"
+    TARGS["line"]="${3}"
+       
+        # Check if lenght of args is 4 (function is given?)
+        if [[ ${TARGS_LEN} -eq 4 ]]; then
+            if [[ -z "$4" ]]; then
+                TARGS["func"]="Script"
+            else
+                TARGS["func"]="${4}"
+            
+            fi
+        else
+            TARGS["func"]="N/A"
+        fi
+
+    # Load data from file
+    error_read_file
+
+    # Merge vars
+    error_merge_vars
+
+    # Generate and output msg
+    error_out_msg
+
+    # Display stack->trace
+    error_stacktrace
+
+    # don't re_run on script exit call
+    rerun=1
+
+    if [ "${ERROR_EXIT}" == true ]; then
+        exit 1
     fi
-    set -u
+
 }
 
 bs_clean() {
