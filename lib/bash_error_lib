@@ -208,7 +208,7 @@ bs_debug() {
 error_read_file() {
 
     # Read content from file
-    IFS=':' read -d '' -ra err_array < 'errors.log'
+    IFS=':' read -d '' -ra err_array < 'stderr'
 
         # 4 (internal) ->= default error message (with arg)
         #-> ./test.sh: line 75: lol: command not found         <- 
@@ -254,6 +254,62 @@ error_read_file() {
     #rm 'stderr'
 }
 
+# Merge ARG VARS
+#
+# This function merges the VARS - TARGS & FARGS into an error conatiner var
+# Check for empty args, check for matching lines
+error_merge_vars(){
+
+    #TARGS - CODE // FILE // LINE // FUNC
+    #FARGS - FILE // LINE // CALL // MSG
+
+    # FIll empty args with N/A
+    if [[ -v "${FARGS["call"]}" ]]; then
+        echo "Set"
+        FARGS["call"]="N/A"
+    fi
+
+    # Fill container...
+    ECONT["code"]="${TARGS["code"]}"
+    ECONT["type"]=$(error_code_matcher "${TARGS["code"]}")           # check wich type of error (error code/extern)
+    ECONT["msg"]="${FARGS["msg"]}"  #//\\n/
+    
+    
+    # Check if it is an Syntax error and re-order vars
+    # If true, we read from external error file.
+    if [ "${FARGS["call"]}" == "syntax error" ]; then
+        ECONT["call"]=" Script"
+        ECONT["cause"]="${FARGS["call"]}"
+    elif [ "${TARGS["func"]}" == "efile" ]; then
+        ECONT["call"]="${FARGS["call"]}"
+        ECONT["cause"]="Syntax error"
+    else
+        ECONT["call"]="${FARGS["call"]}"
+        ECONT["cause"]="${TARGS["func"]}"
+    fi
+    
+    ECONT["source"]="${TARGS["file"]}"
+    
+    # Match lines to get always the same
+    if [[ "${TARGS["line"]}" -eq "${FARGS["line"]}" ]]; then
+        ECONT["line"]="${TARGS["line"]}"
+    else
+        # Checks if FARGS-line is empty
+        if [[ -z ${FARGS["line"]} ]]; then
+            ECONT["line"]="${TARGS["line"]}"
+        else
+            ECONT["line"]="${FARGS["line"]}"
+        fi
+    fi
+    
+    # Check if is external command error
+    if [ "${isExt}" == true ]; then
+        ECONT["cause"]="${FARGS["file"]}"
+    fi
+
+    # done
+    return 0
+}
 
 # Bash error library handler
 # This is an own self written error handler, to handle function
