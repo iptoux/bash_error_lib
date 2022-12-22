@@ -207,7 +207,7 @@ bs_debug() {
 # Errors will logged in an file if enabled.
 #
 # @param $errmsg | @output err
-bs_error() {
+bs_error_trap() {
 
     # oldvars, needed?
     #err_time=$(date "+%H:%M:%S")
