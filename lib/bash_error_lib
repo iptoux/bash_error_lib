@@ -59,12 +59,12 @@ declare -gA ECONT                                       # CONTAINER ERROR VARIAB
 #declare -A eout
 declare -A BECD                                          # CONTAINER ERROR VARIABLE CODE NAMES
 
-ECD[1]="General/External script error."
-ECD[2]="Bash script error."
-ECD[126]="Command invoked cannot be exec."
-ECD[127]="Command (func) not found."
-ECD[128]="Invalid argument to exit."
-ECD[130]="Script terminated by Control-C."
+BECD[1]="General/External script error."
+BECD[2]="Bash script error."
+BECD[126]="Command invoked cannot be exec."
+BECD[127]="Command (func) not found."
+BECD[128]="Invalid argument to exit."
+BECD[130]="Script terminated by Control-C."
 
 
 # Bash error logging, the output printed in an error log file.
@@ -271,7 +271,7 @@ error_merge_vars(){
 
     # Fill container...
     ECONT["code"]="${TARGS["code"]}"
-    ECONT["type"]=$(error_code_matcher "${TARGS["code"]}")           # check wich type of error (error code/extern)
+    ECONT["type"]="${BECD["${TARGS["code"]}"]}"
     ECONT["msg"]="${FARGS["msg"]}"  #//\\n/
     
     
@@ -309,6 +309,24 @@ error_merge_vars(){
 
     # done
     return 0
+}
+
+error_out_msg() {
+
+    local prfx cli_out
+
+    prfx=">> "
+
+    cli_out="\n------------------------------------------------\n"
+
+    cli_out+="${prfx}ERROR (${ECONT["code"]}) - ${ECONT["type"]}\n\n"
+    cli_out+="${prfx}MSG:${ECONT["msg"]}"
+    cli_out+="${prfx}CALL/CMD/ARG:${ECONT["call"]}\n\n"
+    cli_out+="${prfx}CAUSE BY: ${ECONT["cause"]} IN: ${ECONT["source"]} ON LINE: ${ECONT["line"]}\n"
+    cli_out+="${prfx}FULLSTACK:"
+
+    echo -e "${cli_out}"
+    
 }
 
 # Bash error library handler
