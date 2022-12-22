@@ -23,9 +23,9 @@ bs_debug true                               # after sourcing of lib or by comman
 
 ############ LOAD TRAPS ############
 
-trap 'bs_error "$?" "${FUNCNAME[0]}"' ERR
-trap 'bs_error "$?" "${FUNCNAME[0]}"' EXIT
-trap 'bs_clean' EXIT
+# setting up Traps
+trap 'bs_error_trap "$?" "${BASH_SOURCE[0]}" "${LINENO}" "${FUNCNAME}"' ERR
+trap 'bs_error_trap "$?" "${BASH_SOURCE[0]}" "${LINENO}" "${FUNCNAME}"' EXIT
 
 
 ############ EXAMPLES ############
@@ -44,4 +44,4 @@ bs_debug false                              # Can be disabled at any line
 # Unknown command or an unknown function of
 # script.
 
-#somecommand        # <-
+somecommand        # <-
