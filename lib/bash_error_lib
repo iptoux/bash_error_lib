@@ -271,7 +271,8 @@ error_merge_vars(){
 
     # Fill container...
     ECONT["code"]="${TARGS["code"]}"
-    ECONT["type"]="${BECD["${TARGS["code"]}"]}"
+
+    ECONT["type"]="${BECD[${TARGS["code"]}]}"
     ECONT["msg"]="${FARGS["msg"]}"  #//\\n/
     
     
@@ -310,6 +311,22 @@ error_merge_vars(){
     # done
     return 0
 }
+
+# This is the function to get and build stack
+error_stacktrace() {
+    
+    #define local function vars
+    local frame=1 LINE SUB FILE
+
+    # loop through frames (func calls)
+    while read -r LINE SUB FILE < <(caller "${frame}"); do
+        printf '  %s @ %s:%s\n' "${SUB}" "${FILE}" "${LINE}"
+        ((frame++))
+    done
+    
+    echo ""
+}
+
 
 error_out_msg() {
 
