@@ -30,6 +30,7 @@ DEBUG_OPT="-debug"
 set +o errexit  # Deactivate default Exit after first command failure.
 set -E
 
+
 # DATE for log file names.
 DATE=$(date +%m.%d.%y)
 
@@ -44,6 +45,11 @@ exec 2> 'stderr'
 ##################################################################
 ############ DONT ############ EDIT ############ HERE ############
 ##################################################################
+
+# Unsetting ARGS to start fresh
+unset TARGS 
+unset FARGS
+unset ECONT
 
 ############ HANDLER VARS/SETS ############
 # Declaring all needed Container array's variables, lists
@@ -60,10 +66,6 @@ ECD[127]="Command (func) not found."
 ECD[128]="Invalid argument to exit."
 ECD[130]="Script terminated by Control-C."
 
-
-
-
-unset eout
 
 # Bash error logging, the output printed in an error log file.
 # This function builds the style of the log entry. Variables are stored
@@ -194,6 +196,62 @@ bs_debug() {
         set +o xtrace
     fi
 
+}
+
+
+#### READ FROM FILE ###
+#######################
+#
+# This function loads the erros information from external error file.
+# After loading, the array lenght will be checked. This is needed to 
+# get the all informations of an error, also if it is external.
+error_read_file() {
+
+    # Read content from file
+    IFS=':' read -d '' -ra err_array < 'errors.log'
+
+        # 4 (internal) ->= default error message (with arg)
+        #-> ./test.sh: line 75: lol: command not found         <- 
+        #
+        # 3 (external) ->= needs check, if trap gives needed vales.        
+        #-> cat: lol: No such file or directory            <- 
+        #        
+        # 3 (internal) ->= default error message (without arg)
+        #./test.sh: line 83: syntax error near unexpected token `}'
+        if [[ ${#err_array[@]} -eq 5 ]]; then
+            
+            #echo "Multiline error/errors"
+            FARGS["file"]=${err_array[0]}
+            FARGS["line"]=${err_array[1]##* }
+            FARGS["call"]=${err_array[4]//$'\n'/} # ${dt//$'\n'/} # Remove all newlines. ${dt%$'\n'}  # Remove a trailing newline. 
+            FARGS["msg"]=$(echo "${err_array[2]}" | cut -d '.' -f1)
+            # Add new line
+            FARGS["msg"]="${FARGS["msg"]}
+"
+        elif [[ ${#err_array[@]} -eq 4 ]]; then
+            # "Sinleline default (4) with argument/cmd"
+            FARGS["file"]=${err_array[0]}
+            FARGS["line"]=${err_array[1]##* }
+            FARGS["call"]=${err_array[2]}
+            FARGS["msg"]=${err_array[3]}
+        elif [ -n "${err_array[1]##* }" ] && [ "${err_array[1]##* }" -eq "${err_array[1]##* }" ] 2>/dev/null; then
+                # "Singleline default (3) without argument/cmd"
+                FARGS["file"]=${err_array[0]}
+                FARGS["line"]=${err_array[1]##* }
+                FARGS["msg"]=${err_array[2]}
+        else
+                # "Singleline default external error by internal call, no line, source, func."
+                FARGS["file"]=${err_array[0]}
+                FARGS["call"]=${err_array[1]}
+                FARGS["msg"]=${err_array[2]}
+
+                # this is an external error.
+                declare -g isExt=true
+
+        fi    
+
+    #delete tmp_err file
+    #rm 'stderr'
 }
 
 
