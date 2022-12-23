@@ -38,8 +38,11 @@ set -E
 DATE=$(date +%m.%d.%y)
 
 LOG_DIR="logs/"
+LOG_MAXCOUNT=5                                      # How many logs per day' should be keep?
+LOG_MAXDAY=7                                        # How many day' should be keep?
 ERROR_FILE=${LOG_DIR}${DATE}'_error.log'
 DEBUG_FILE=${LOG_DIR}${DATE}'_'${DEBUG_PID}'.log'
+
 
 # Redirect stderr to file for parsing errors....
 exec 2> 'stderr'
