@@ -1,3 +1,38 @@
+### 1.2.0 (2022-12-23)
+
+##### Documentation Changes
+
+* **readme:**  Add keywords, update icons. ([f52f60d3](https://github.com/iptoux/bash_error_lib/commit/f52f60d3d69658fed6db86a1ca108f9173944f8b))
+
+##### Bug Fixes
+
+* **readme:**  Update index links, update keyw. icon ([285c7e8c](https://github.com/iptoux/bash_error_lib/commit/285c7e8c429056e5da7bf059073a1328fb82712b))
+
+##### Other Changes
+
+* **git:**
+  *  version ([fdd94b88](https://github.com/iptoux/bash_error_lib/commit/fdd94b886f5c9faa068240197c8468289bb5af73))
+  *  add gitpod workfiles. ([ca0fe540](https://github.com/iptoux/bash_error_lib/commit/ca0fe5405391c91de0dff0fca4c6f5763acc8a7e))
+* **readme:**  Updating ([c35ab872](https://github.com/iptoux/bash_error_lib/commit/c35ab87271955aa6f6540fdffbb224dd31354aa7))
+* **library:**
+  *  external calls ([79e2e626](https://github.com/iptoux/bash_error_lib/commit/79e2e626c09d95e57ec3db02f604191fbf33ef4c))
+  *  catches, logging ([7fafb0e6](https://github.com/iptoux/bash_error_lib/commit/7fafb0e627117dc81003c8b430865ebb281041de))
+  *  logfile, rename, fix ([cfb7d57c](https://github.com/iptoux/bash_error_lib/commit/cfb7d57c69e47579bcc98ae7982156925fd0ae67))
+  *  cause error ([6a01292a](https://github.com/iptoux/bash_error_lib/commit/6a01292a011020c393576975fbf439cd5aedf857))
+  *  filesrc,rename,clean ([15113369](https://github.com/iptoux/bash_error_lib/commit/15113369a34a7108e19ceb1e8e3bdcbe83a7181e))
+  *  time, case ([884490e3](https://github.com/iptoux/bash_error_lib/commit/884490e3219e277b3f7321b7bc04d12a6e2df647))
+  *  typo & call ([9e5a0684](https://github.com/iptoux/bash_error_lib/commit/9e5a0684ad0a4d42d26d76ccf0e1548ff0d8929d))
+* **logfiles:**  preparing keep&clean ([d0244c6e](https://github.com/iptoux/bash_error_lib/commit/d0244c6e9c8b2af131488e602443cbbde2189efa))
+* **stacktrace:**  adding stacktrace ([681c6b8a](https://github.com/iptoux/bash_error_lib/commit/681c6b8a8dfb5b59daf064b0be73164fa89d7465))
+* **output:**  Add new func ([48ea8a4b](https://github.com/iptoux/bash_error_lib/commit/48ea8a4b4d5f20075321c6cd14191126898e7ca6))
+* **merging:**  adding to library ([1d0f59c2](https://github.com/iptoux/bash_error_lib/commit/1d0f59c2a86333374d4f691f41f38b568cbc6874))
+* **stderr:**  Rework load file ([0203a216](https://github.com/iptoux/bash_error_lib/commit/0203a2161da8444d962432b4f7e7841a8af85567))
+* **Main:**  change name and args ([92ef3843](https://github.com/iptoux/bash_error_lib/commit/92ef3843950a51b90e016e8325609c05d112f958))
+* **main:**
+  *  change trapname" ([04e3e51e](https://github.com/iptoux/bash_error_lib/commit/04e3e51e67f932b23a4411a35875125bf3b2e60d))
+  *  change trapname ([0323fee4](https://github.com/iptoux/bash_error_lib/commit/0323fee463bfeeea21a72b35b5c1bf94b47a0217))
+* **bs_error:**  recode ([ee72413b](https://github.com/iptoux/bash_error_lib/commit/ee72413b3331acc2a19a6fc5075eb6beb4fe5075))
+
 #### 1.1.1 (2022-12-15)
 
 ##### Documentation Changes
