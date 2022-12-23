@@ -22,7 +22,8 @@ MTSTART=$(date +%s.%N)
 # Error
 ERROR_EXIT=true
 ERROR_LOG=true
-ERROR_SRC_SNIPPED=true
+ERROR_DISP_SNIPPED=true
+ERROR_DISP_STACK=true
 
 # Debug
 DEBUG_PID=$$
@@ -41,7 +42,7 @@ LOG_DIR="logs/"
 LOG_MAXCOUNT=5                                      # How many logs per day' should be keep?
 LOG_MAXDAY=7                                        # How many day' should be keep?
 ERROR_FILE=${LOG_DIR}${DATE}'_error.log'
-DEBUG_FILE=${LOG_DIR}${DATE}'_'${DEBUG_PID}'.log'
+DEBUG_FILE=${LOG_DIR}${DATE}'_debug_'${DEBUG_PID}'.log'
 
 
 # Redirect stderr to file for parsing errors....
@@ -63,6 +64,7 @@ declare -A TARGS                                        # ARGS FROM TRAP
 declare -gA FARGS                                       # ARGS FROME FILE
 declare -gA ECONT                                       # CONTAINER ERROR VARIABLES (MERGE)
 declare -A BECD                                          # CONTAINER ERROR VARIABLE CODE NAMES
+declare -g OUTMSG
 
 BECD[1]="General/External script error."
 BECD[2]="Bash script error."
@@ -126,57 +128,6 @@ bs_error_log() {
         echo -e "${emsg}" >> "${ERROR_FILE}"
         return 0
     fi
-}
-
-bs_error_cli() {
-
-    clierrout="\n------------------------------------------------\n"
-
-    # Generate cli output, building head
-    if ! [ -n "${eout[2]}" ]; then
-            eout[2]=${eout[3]}
-            clierrout+="\n>> ERROR (${eout[1]}) - ${ECD[2]}\n"
-    else
-        clierrout+="\n>> ERROR (${eout[1]}) - ${ECD[${eout[1]}]}\n"
-    fi
-    
-    # Building body
-    clierrout+=">> ->${eout[3]} <-\n"
-    clierrout+="\n>> Caused by: ${eout[4]}\n"
-    clierrout+=">> At file: ${eout[5]} on or near line ${eout[6]}\n"
-    #clierrout+=">> In: ${eout[4]}\n"
-
-    if  [ "${eout[7]}" == true ]; then
-        clierrout+="\n>> Exit on error: (auto) default\n"
-    else
-        clierrout+="\n>> Exit on error: ${ERROR_EXIT}\n"
-    fi
-
-    clierrout+=">> Code-snipped: ${ERROR_SRC_SNIPPED}\n"
-
-    # Check if file source snipped should be displayd
-    if [ "${ERROR_SRC_SNIPPED}" == true ]; then
-        if [ "${ERROR_EXIT}" == true ]; then
-
-            clierrout+="\n------------------------------------------------\n"
-            clierrout+="\n>> -> 08 lines of source from ${eout[5]} <-\n"
-            
-            clierrout+=">> {\n"
-
-            regfile=${eout[5]}
-            regex=$(awk 'NR>L-5 && NR<L+5 { printf "L:%-5d%3s%s\n",NR,(NR==L?">>>":""),$regfile }' L="${eout[6]}" "${eout[5]}")
-                    
-            clierrout+="${regex}\n>> }\n"
-        else
-            clierrout+="\nSet EXIT on Error to show!\n"
-        fi
-    fi
-
-    # Actual push to stdrout
-    echo -e "${clierrout}"
-
-    return 0
-
 }
 
 # An simple function that handels the debug output.
@@ -332,34 +283,52 @@ error_merge_vars(){
 error_stacktrace() {
     
     #define local function vars
-    local frame=1 LINE SUB FILE
+    local frame=1 LINE SUB FILE prfx
+
+    prfx=">> "
+    
+    # add blank line
+    OUTMSG+="${prfx}FULLSTACK:\n"
 
     # loop through frames (func calls)
     while read -r LINE SUB FILE < <(caller "${frame}"); do
-        printf '  %s @ %s:%s\n' "${SUB}" "${FILE}" "${LINE}"
+        OUTMSG+=$(printf '  %s @ %s:%s\n' "${SUB}" "${FILE}" "${LINE}")
         ((frame++))
     done
-    
-    echo ""
+
+    OUTMSG+="\n"
 }
 
 
 error_out_msg() {
 
-    local prfx cli_out
+    local prfx
 
     prfx=">> "
 
-    cli_out="\n------------------------------------------------\n"
+    OUTMSG="\n------------------------------------------------\n"
 
-    cli_out+="${prfx}ERROR (${ECONT["code"]}) - ${ECONT["type"]}\n\n"
-    cli_out+="${prfx}MSG:${ECONT["msg"]}"
-    cli_out+="${prfx}CALL/CMD/ARG:${ECONT["call"]}\n\n"
-    cli_out+="${prfx}CAUSE BY: ${ECONT["cause"]} IN: ${ECONT["source"]} ON LINE: ${ECONT["line"]}\n"
-    cli_out+="${prfx}FULLSTACK:"
-
-    echo -e "${cli_out}"
+    OUTMSG+="${prfx}ERROR (${ECONT["code"]}) - ${ECONT["type"]}\n\n"
+    OUTMSG+="${prfx}MSG:${ECONT["msg"]}"
+    OUTMSG+="${prfx}CALL/CMD/ARG:${ECONT["call"]}\n\n"
+    OUTMSG+="${prfx}CAUSE BY: ${ECONT["cause"]} IN: ${ECONT["source"]} ON LINE: ${ECONT["line"]}\n"
     
+}
+
+error_read_src() {
+
+    local prfx
+
+    prfx=">> "
+    OUTMSG+="\n>> SNIPPED:\n"
+    OUTMSG+="\n>> -> 08 lines of source from ${eout[5]} <-\n"
+    OUTMSG+=">> {\n"
+
+    regfile=${ECONT["source"]}
+    regex=$(awk 'NR>L-5 && NR<L+5 { printf "L:%-5d%3s%s\n",NR,(NR==L?">>>":""),$regfile }' L="${ECONT["line"]}" "${ECONT["source"]}")
+                    
+    OUTMSG+="${regex}\n>> }\n"
+
 }
 
 # Bash error library handler
@@ -412,11 +381,20 @@ bs_error_trap() {
     # Merge vars
     error_merge_vars
 
-    # Generate and output msg
+    # Generate default output msg
     error_out_msg
+    
+    # Check if stacktrace should be displayd
+    if [ "${ERROR_DISP_STACK}" == true ]; then
+        error_stacktrace
+    fi
 
-    # Display stack->trace
-    error_stacktrace
+    # Check if file source snipped should be displayd
+    if [ "${ERROR_DISP_SNIPPED}" == true ]; then
+        error_read_src
+    fi
+    
+    echo -e "${OUTMSG}"
 
     # don't re_run on script exit call
     rerun=1
