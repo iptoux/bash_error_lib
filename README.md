@@ -9,7 +9,13 @@
     <img src="https://img.shields.io/github/package-json/keywords/iptoux/bash_error_lib?style=flat-square" title="GitHub package.json dynamic"> 
 </p>
 
-This is an bash error "library", an error handler for any kind of bash script. The library catches mostly all defaults script errors and syntax erros by an trap and displays/logs them.
+This is an bash error "library", an error handler for any kind of bash script. The library catches mostly all  script errors and syntax erros by an trap and displays/logs them. The library includes:
+
+- error logging
+- debug logging
+- display stack
+- colors & themes
+- STANDALONE SINGLEFILE!
 
 ## Index
 
@@ -37,13 +43,17 @@ An Package, an all in one suite, that is easy to include and use.
 
 ## How it works
 ---
-An trap, set in the begin of any bash script, calls the error handler function. The function reads, validates the error, build an array that contains all needed informations for output. After that, the logger is called, than the cli output.
+An trap, set in the begin of any kind of bash script, calls the error handler function. The function reads the vars given by trap. Than it loads the error from the redirected stderr and merges them into and error container. After some checks of user variables(debug/log/stack), the output message will be build and printed.
 
 ## Control
 
-- Option to exit on error
-- Option to display source code snipped (from called error)
-- Oprion to log in an error file
+- [ ] Option to exit on error
+- [x] Option to enable/disable logging (file)
+- [x] Option to display errorstack
+- [x] Option to display source code snipped (from called error)
+- [x] Oprion to log in an error file
+- [x] Option to enable debug (also via cmd option)
+
 
 ## Screenshots/Output
 ---
@@ -53,27 +63,33 @@ An trap, set in the begin of any bash script, calls the error handler function. 
 iptoux@2040:~/gits/bash_error_lib$ ./basherr.sh 
 
 ------------------------------------------------
+>> ERROR (1) - General/External script error.
 
->> ERROR (127) - Command (func) not found.
->> -> somecommand <-
+>> MSG: No such file or directory
+>> CALL/CMD/ARG: lol
 
->> Caused by:  Source.
->> At file: ./basherr.sh on or near line 42
+>> CAUSE BY: cat IN: ./basherr.sh ON LINE: 50
+>> FULLSTACK:
+    huhu @ ./basherr.sh:50
+    main @ ./basherr.sh:54
 
->> Exit on error: true
->> Code-snipped: true
+>> SNIPPED:
 
-------------------------------------------------
-
->> -> 08 lines of source from ./basherr.sh <-
+>> -> 08 lines of source from  <-
 >> {
-L:38      
-L:39      # Unknown command or an unknown function of
-L:40      # script.
-L:41      
-L:42   >>>somecommand
+L:46      #somecommand        # <-
+L:47      
+L:48      huhu() {
+L:49      
+L:50   >>>    cat lol
+L:51      
+L:52      }
+L:53      
+L:54      huhu
 >> }
 
+>> There are 6 log files in folder, cleaning....
+>> Execution time: 0.322949 seconds
 iptoux@2040:~/gits/bash_error_lib$ 
 ```
 
@@ -94,40 +110,39 @@ iptoux@2040:~/gits/bash_error_lib$
 
 **LOG**
 ```
-#### + 22:53:57 + ###################### ERROR ########################
-##
-##	Exitcode: 127		|	Msg: command not found
-##
-##	>>> somecommand
-##
-##	------------------------------------------------------------
-##
-##	Call from:  Source.		|	Line: 42
-##
-##	File: ./basherr.sh
-##
-##	------------------------------------------------------------
-##
-##		>>> 08 lines of source code (snipped) <<<
-##
-## {
-##	L:38      
-##	L:39      # Unknown command or an unknown function of
-##	L:40      # script.
-##	L:41      
-##	L:42   >>>somecommand
-## }
-##
-########################################################## EXIT #######
+>> Date/Time: 23.12.2022 - 23:44:38
+------------------------------------------------
+>> ERROR (1) - General/External script error.
+
+>> MSG: No such file or directory
+>> CALL/CMD/ARG: lol
+
+>> CAUSE BY: cat IN: ./basherr.sh ON LINE: 50
+>> FULLSTACK:
+    huhu @ ./basherr.sh:50
+    main @ ./basherr.sh:54
+
+>> SNIPPED:
+
+>> -> 08 lines of source from  <-
+>> {
+L:46      #somecommand        # <-
+L:47      
+L:48      huhu() {
+L:49      
+L:50   >>>    cat lol
+L:51      
+L:52      }
+L:53      
+L:54      huhu
+>> }
 ```
 
 ---
 
 **IMAGES**
 
-![CLI](../assets/cli.png?raw=true)
-
-![LOG](../assets/log.png?raw=true)
+comming soon.
 
 ## HowTo
 ---
@@ -149,9 +164,10 @@ Source file in your script
 Set Traps
 
 ```
-trap 'bs_error "$?" "${FUNCNAME[0]}"' ERR
-trap 'bs_error "$?" "${FUNCNAME[0]}"' EXIT
-trap 'bs_clean' EXIT
+# setting up Traps
+trap 'bs_error_trap "$?" "${BASH_SOURCE[0]}" "${LINENO}" "${FUNCNAME}"' ERR
+trap 'bs_error_trap "$?" "${BASH_SOURCE[0]}" "${LINENO}" "${FUNCNAME}"' EXIT
+
 ```
 
 **Done**
@@ -160,8 +176,8 @@ Yes! thats all, now the library is ready an loaded in your script when you run i
 
 ## Example?
 
-`The basherr.sh in the repo is an example, that shows how to include in your script and calls errors. All files are "well" documented.
+The `basherr.sh` in the repo is an example, that shows how to include in your script and calls errors. All files are "well" documented.
 
 ## ToDo
 
-- More documentation
+- [ ] More documentation
