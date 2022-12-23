@@ -44,4 +44,4 @@ bs_debug false                              # Can be disabled at any line
 # Unknown command or an unknown function of
 # script.
 
-#somecommand        # <-
+somecommand        # <-
