@@ -56,7 +56,6 @@ unset ECONT
 declare -A TARGS                                        # ARGS FROM TRAP
 declare -gA FARGS                                       # ARGS FROME FILE
 declare -gA ECONT                                       # CONTAINER ERROR VARIABLES (MERGE)
-#declare -A eout
 declare -A BECD                                          # CONTAINER ERROR VARIABLE CODE NAMES
 
 BECD[1]="General/External script error."
@@ -372,6 +371,7 @@ bs_error_trap() {
         if [[ ${TARGS["code"]} -eq 0 ]] || [[ ${rerun} -eq 1 ]]; then
             echo "Jumping to cleanUp!"
             unset rerun
+            bs_clean
             return 0
         fi
 
@@ -414,8 +414,8 @@ bs_error_trap() {
 bs_clean() {
     if [ -f 'stderr' ]; then
         rm 'stderr'
-        return
     fi
+    echo "done."
     return 0
 }
 
