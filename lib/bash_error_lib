@@ -14,6 +14,9 @@
 # For more details read&visit 
 # https://github.com/iptoux/bash_error_lib/wiki
 
+MTSTART=$(date +%s.%N)
+
+
 ############ LIBRARY VARIABLES ############
 
 # Error
@@ -34,7 +37,7 @@ set -E
 # DATE for log file names.
 DATE=$(date +%m.%d.%y)
 
-LOG_DIR=""
+LOG_DIR="logs/"
 ERROR_FILE=${LOG_DIR}${DATE}'_error.log'
 DEBUG_FILE=${LOG_DIR}${DATE}'_'${DEBUG_PID}'.log'
 
@@ -234,11 +237,22 @@ error_read_file() {
             FARGS["call"]=${err_array[2]}
             FARGS["msg"]=${err_array[3]}
         elif [ -n "${err_array[1]##* }" ] && [ "${err_array[1]##* }" -eq "${err_array[1]##* }" ] 2>/dev/null; then
+            if [[ ${#err_array[@]} -gt 5 ]]; then
+                # "multiline args bigger than 5 / some external call"
+                FARGS["file"]=${err_array[0]}
+                FARGS["line"]=${err_array[1]##* }
+                FARGS["call"]=${err_array[2]}
+                FARGS["msg"]=$(echo "${err_array[3]}" | cut -d $'\n' -f1)
+                FARGS["msg"]+="\n"
+
+            else
                 # "Singleline default (3) without argument/cmd"
                 FARGS["file"]=${err_array[0]}
                 FARGS["line"]=${err_array[1]##* }
                 FARGS["msg"]=${err_array[2]}
+            fi
         else
+                echo "yes"
                 # "Singleline default external error by internal call, no line, source, func."
                 FARGS["file"]=${err_array[0]}
                 FARGS["call"]=${err_array[1]}
@@ -369,7 +383,6 @@ bs_error_trap() {
         # Check if script is called by default script 
         # exit (0) or error -> jump to cleanup if true
         if [[ ${TARGS["code"]} -eq 0 ]] || [[ ${rerun} -eq 1 ]]; then
-            echo "Jumping to cleanUp!"
             unset rerun
             bs_clean
             return 0
@@ -412,10 +425,15 @@ bs_error_trap() {
 }
 
 bs_clean() {
+
+    local dur
+
     if [ -f 'stderr' ]; then
-        rm 'stderr'
+         rm 'stderr'
     fi
-    echo "done."
+    
+    dur=$(echo "$(date +%s.%N)"-"${MTSTART}" | node -p)
+    printf ">> Execution time: %.6f seconds\n" "${dur}"
     return 0
 }
 
