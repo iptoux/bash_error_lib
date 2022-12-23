@@ -38,10 +38,20 @@ trap 'bs_error_trap "$?" "${BASH_SOURCE[0]}" "${LINENO}" "${FUNCNAME}"' EXIT
 #}                  # <-
 #hello_world        # <-
 
-# Disable debug output
-bs_debug false                              # Can be disabled at any line
+
 
 # Unknown command or an unknown function of
 # script.
 
-somecommand        # <-
+#somecommand        # <-
+
+huhu() {
+
+    cat lol
+
+}
+
+huhu
+
+# Disable debug output
+bs_debug false                              # Can be disabled at any line
