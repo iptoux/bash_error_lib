@@ -74,62 +74,6 @@ BECD[128]="Invalid argument to exit."
 BECD[130]="Script terminated by Control-C."
 
 
-# Bash error logging, the output printed in an error log file.
-# This function builds the style of the log entry. Variables are stored
-# global in eout[@]
-bs_error_log() {
-
-    # check if logging of errors in enabled.
-    if [ "${ERROR_LOG}" == true ]; then
-
-        # part of theme (line-split)
-        lsp="##\n"
-
-        # generate head
-        emsg_head="\n#### + ${eout[0]} + ###################### ERROR ######################${lsp}"
-        emsg_head+="${lsp}"
-        
-        # generate body
-        emsg_body="##\tExitcode: ${eout[1]}\t\t|\tMsg:${eout[2]}\n"
-        emsg_body+="${lsp}##\t>>>${eout[3]}\n"
-        emsg_body+="${lsp}##\t------------------------------------------------------------\n"
-        emsg_body+="${lsp}##\tCall from: ${eout[4]}\t\t|\tLine: ${eout[6]}\n"
-        emsg_body+="${lsp}##\tFile: ${eout[5]}\n"
-
-        # show source file output on failed line?
-        # if yes, new split, else go to footer.
-
-            if [ "${ERROR_SRC_SNIPPED}" == true ]; then
-                # add output
-                eded="${lsp}##\t------------------------------------------------------------\n"
-                eded+="${lsp}##\t\t>>> 08 lines of source code (snipped) <<<\n"
-                eded+="${lsp}## {\n"
-
-                regfile=${eout[5]}
-
-                regex=$(awk 'NR>L-5 && NR<L+5 { printf "##\tL:%-5d%3s%s\n",NR,(NR==L?">>>":""),$regfile }' L="${eout[6]}" "${eout[5]}")
-                
-                eded+="${regex}\n## }\n"
-
-                emsg_body+="${eded}"
-            fi
-
-        # generate footer
-
-        if [ "${ERROR_EXIT}" == false ] && [ "${eout[7]}" == false ]; then
-            emsg_footer+="${lsp}################################################# SKIP ERROR #####${lsp}"    
-            else
-            emsg_footer+="${lsp}########################################################## EXIT #####${lsp}"
-        fi
-
-        # combine head+body+footer to one var
-        emsg="${emsg_head}${emsg_body}${emsg_footer}"
-
-        echo -e "${emsg}" >> "${ERROR_FILE}"
-        return 0
-    fi
-}
-
 # An simple function that handels the debug output.
 # Checks if $SDEBUG is true. When @param "false" is
 # given on call, you can disable debug mode on any file/line.
@@ -315,6 +259,34 @@ error_out_msg() {
     
 }
 
+# Bash error logging, the output printed in an error log file.
+# This function builds the style of the log entry.
+error_out_log() {
+
+    local logtime mode
+
+    unset mode logtime
+
+    mode=$1
+
+        case ${mode} in
+            fancy)
+                # load (user) theme frome file
+            ;;
+            *)  # default output to logfile (same as onscreen)
+                # adding Logtime
+                logtime=$(date +%d.%m.%Y' - '%H:%M:%S)
+                OUTMSG_LOG="\n>> Date/Time: ${logtime}"
+                OUTMSG_LOG+="${OUTMSG}"
+            ;;
+        esac
+
+        # Write output to logfile...
+        echo -e "${OUTMSG_LOG}" >> "${ERROR_FILE}"
+
+}
+
+
 error_read_src() {
 
     local prfx
@@ -356,7 +328,7 @@ bs_error_trap() {
         # exit (0) or error -> jump to cleanup if true
         if [[ ${TARGS["code"]} -eq 0 ]] || [[ ${rerun} -eq 1 ]]; then
             unset rerun
-            bs_clean
+            error_exit_clean
             return 0
         fi
 
@@ -393,19 +365,25 @@ bs_error_trap() {
     if [ "${ERROR_DISP_SNIPPED}" == true ]; then
         error_read_src
     fi
-    
+
+    # Check if logging of errors in enabled.
+    if [ "${ERROR_LOG}" == true ]; then
+        error_out_log ""
+    fi
+
     echo -e "${OUTMSG}"
 
     # don't re_run on script exit call
     rerun=1
 
+    # Check if Exit on error is true.
     if [ "${ERROR_EXIT}" == true ]; then
         exit 1
     fi
 
 }
 
-bs_clean() {
+error_exit_clean() {
 
     local dur
 
