@@ -150,7 +150,7 @@ error_read_file() {
                 FARGS["msg"]=${err_array[2]}
             fi
         else
-                echo "yes"
+                
                 # "Singleline default external error by internal call, no line, source, func."
                 FARGS["file"]=${err_array[0]}
                 FARGS["call"]=${err_array[1]}
@@ -192,16 +192,22 @@ error_merge_vars(){
     if [ "${FARGS["call"]}" == "syntax error" ]; then
         ECONT["call"]=" Script"
         ECONT["cause"]="${FARGS["call"]}"
-    elif [ "${TARGS["func"]}" == "efile" ]; then
+    elif [ "${TARGS["func"]}" == "error_read_file" ]; then
         ECONT["call"]="${FARGS["call"]}"
-        ECONT["cause"]="Syntax error"
+        ECONT["cause"]="main"
     else
         ECONT["call"]="${FARGS["call"]}"
         ECONT["cause"]="${TARGS["func"]}"
     fi
     
-    ECONT["source"]="${TARGS["file"]}"
-    
+    if [ "${TARGS["file"]}" != "${FARGS["file"]}" ]; then
+        ECONT["source"]="${TARGS["file"]}"
+    elif [ "${FARGS["file"]}" != "${TARGS["file"]}" ]; then
+        ECONT["source"]="${FARGS["file"]}"
+    else
+        ECONT["source"]="${TARGS["file"]}"
+    fi
+
     # Match lines to get always the same
     if [[ "${TARGS["line"]}" -eq "${FARGS["line"]}" ]]; then
         ECONT["line"]="${TARGS["line"]}"
@@ -236,11 +242,11 @@ error_stacktrace() {
 
     # loop through frames (func calls)
     while read -r LINE SUB FILE < <(caller "${frame}"); do
-        OUTMSG+=$(printf '  %s @ %s:%s\n' "${SUB}" "${FILE}" "${LINE}")
+        OUTMSG+="    ${SUB} @ ${FILE}:${LINE}\n"
+        #OUTMSG+=$(printf '  %s @ %s:%s\n\n' "${SUB}" "${FILE}" "${LINE}")
         ((frame++))
     done
 
-    OUTMSG+="\n"
 }
 
 
@@ -390,6 +396,14 @@ error_exit_clean() {
     if [ -f 'stderr' ]; then
          rm 'stderr'
     fi
+
+    count_debug_logs=$(find ${LOG_DIR}$(date +%m.%d.%y)_debug* | wc -l)
+    
+        if [[ ${count_debug_logs} -gt ${LOG_MAXCOUNT} ]]; then
+            printf ">> There are %s log files in folder, cleaning....\n" "${count_debug_logs}"
+
+            rm ${LOG_DIR}$(date +%m.%d.%y)_debug*
+        fi
     
     dur=$(echo "$(date +%s.%N)"-"${MTSTART}" | node -p)
     printf ">> Execution time: %.6f seconds\n" "${dur}"
