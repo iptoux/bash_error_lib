@@ -40,8 +40,7 @@ DATE=$(date +%m.%d.%y)
 LOG_DIR="logs/"
 LOG_MAXCOUNT=5                                      # How many logs per day' should be keep?
 LOG_MAXDAY=7                                        # How many day' should be keep?
-ERROR_FILE=${LOG_DIR}${DATE}'_error.log'
-DEBUG_FILE=${LOG_DIR}${DATE}'_debug_'${DEBUG_PID}'.log'
+
 
 ######################## BEGIN OF LIBRARY ########################
 ##################################################################
@@ -52,6 +51,8 @@ DEBUG_FILE=${LOG_DIR}${DATE}'_debug_'${DEBUG_PID}'.log'
 exec 2> 'stderr'
 
 DEBUG_PID=$$
+ERROR_FILE=${LOG_DIR}${DATE}'_error.log'
+DEBUG_FILE=${LOG_DIR}${DATE}'_debug_'${DEBUG_PID}'.log'
 
 # Unsetting ARGS to start fresh
 unset TARGS 
