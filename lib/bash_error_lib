@@ -26,7 +26,6 @@ ERROR_DISP_SNIPPED=true
 ERROR_DISP_STACK=true
 
 # Debug
-DEBUG_PID=$$
 DEBUG_AUTO=false
 DEBUG_OPT="-debug"
 
@@ -44,14 +43,15 @@ LOG_MAXDAY=7                                        # How many day' should be ke
 ERROR_FILE=${LOG_DIR}${DATE}'_error.log'
 DEBUG_FILE=${LOG_DIR}${DATE}'_debug_'${DEBUG_PID}'.log'
 
-
-# Redirect stderr to file for parsing errors....
-exec 2> 'stderr'
-
 ######################## BEGIN OF LIBRARY ########################
 ##################################################################
 ############ DONT ############ EDIT ############ HERE ############
 ##################################################################
+
+# Redirect stderr to file for parsing errors....
+exec 2> 'stderr'
+
+DEBUG_PID=$$
 
 # Unsetting ARGS to start fresh
 unset TARGS 
@@ -400,9 +400,9 @@ error_exit_clean() {
     count_debug_logs=$(find ${LOG_DIR}$(date +%m.%d.%y)_debug* | wc -l)
     
         if [[ ${count_debug_logs} -gt ${LOG_MAXCOUNT} ]]; then
-            printf ">> There are %s log files in folder, cleaning....\n" "${count_debug_logs}"
+            printf ">> There are %s debug log files in folder, cleaning....\n" "${count_debug_logs}"
 
-            rm ${LOG_DIR}$(date +%m.%d.%y)_debug*
+            ls -t logs/*debug* | tail -n +2 | xargs rm --
         fi
     
     dur=$(echo "$(date +%s.%N)"-"${MTSTART}" | node -p)
