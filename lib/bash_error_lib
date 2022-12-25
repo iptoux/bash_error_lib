@@ -65,7 +65,9 @@ declare -A TARGS                                        # ARGS FROM TRAP
 declare -gA FARGS                                       # ARGS FROME FILE
 declare -gA ECONT                                       # CONTAINER ERROR VARIABLES (MERGE)
 declare -A BECD                                          # CONTAINER ERROR VARIABLE CODE NAMES
-declare -g OUTMSG
+
+OUTMSG=""
+OUT_COLOR=false
 
 BECD[1]="General/External script error."
 BECD[2]="Bash script error."
@@ -236,15 +238,23 @@ error_stacktrace() {
     #define local function vars
     local frame=1 LINE SUB FILE prfx
 
-    prfx=">> "
-    
+
+        if [ ${OUT_COLOR} == true ]; then
+            prfx="\n${C['RED']}>> ${F['END']}${C['CYN']}${F['UBE']}FULLSTACK:${F['END']}\n"
+        else
+            prfx="\n>> FULLSTACK:\n\n"
+        fi
+
     # add blank line
-    OUTMSG+="${prfx}FULLSTACK:\n"
+    OUTMSG+="${prfx}"
 
     # loop through frames (func calls)
     while read -r LINE SUB FILE < <(caller "${frame}"); do
-        OUTMSG+="    ${SUB} @ ${FILE}:${LINE}\n"
-        #OUTMSG+=$(printf '  %s @ %s:%s\n\n' "${SUB}" "${FILE}" "${LINE}")
+        if [ ${OUT_COLOR} == true ]; then
+            OUTMSG+="    ${SUB} @ ${FILE}:${LINE}\n"
+        else
+            OUTMSG+="    ${SUB} @ ${FILE}:${LINE}\n"
+        fi
         ((frame++))
     done
 
@@ -255,14 +265,24 @@ error_out_msg() {
 
     local prfx
 
-    prfx=">> "
-
-    OUTMSG="\n------------------------------------------------\n"
-
-    OUTMSG+="${prfx}ERROR (${ECONT["code"]}) - ${ECONT["type"]}\n\n"
-    OUTMSG+="${prfx}MSG:${ECONT["msg"]}"
-    OUTMSG+="${prfx}CALL/CMD/ARG:${ECONT["call"]}\n\n"
-    OUTMSG+="${prfx}CAUSE BY: ${ECONT["cause"]} IN: ${ECONT["source"]} ON LINE: ${ECONT["line"]}\n"
+    if [ ${OUT_COLOR} == true ]; then
+        prfx="${C['RED']}>> ${F['END']}"
+        
+        OUTMSG="\n------------------------------------------------\n"
+        OUTMSG+="${prfx}${C['RED']}${F['BLD']}ERROR (${ECONT["code"]})${C['WHT']} - ${ECONT["type"]}${F['END']}\n\n"
+        OUTMSG+="${prfx}${C['CYN']}MSG:${F['END']}${C['GRN']}${ECONT["msg"]}${F['END']}"
+        OUTMSG+="${prfx}${C['CYN']}CALL/CMD/ARG:${F['END']}${C['GRN']}${ECONT["call"]}${F['END']}\n"
+        OUTMSG+="${prfx}${C['CYN']}CAUSE BY: ${F['END']}${C['RED']}${ECONT["cause"]} ${C['WHT']}IN: ${C['RED']}${F['UBE']}${ECONT["source"]}${F['UEN']} ${C['WHT']}ON LINE: ${C['GRN']}${ECONT["line"]}${F['END']}\n"
+    
+    else
+        prfx=">> "
+        
+        OUTMSG="\n------------------------------------------------\n"
+        OUTMSG+="${prfx}ERROR (${ECONT["code"]}) - ${ECONT["type"]}\n\n"
+        OUTMSG+="${prfx}MSG:${ECONT["msg"]}"
+        OUTMSG+="${prfx}CALL/CMD/ARG:${ECONT["call"]}\n"
+        OUTMSG+="${prfx}CAUSE BY: ${ECONT["cause"]} IN: ${ECONT["source"]} ON LINE: ${ECONT["line"]}\n"
+    fi
     
 }
 
@@ -298,17 +318,65 @@ error_read_src() {
 
     local prfx
 
-    prfx=">> "
-    OUTMSG+="\n>> SNIPPED:\n"
-    OUTMSG+="\n>> -> 08 lines of source from ${eout[5]} <-\n"
-    OUTMSG+=">> {\n"
+    if [ ${OUT_COLOR} == true ]; then
+            prfx="${C['RED']}>> ${F['END']}"
+            OUTMSG+="\n${prfx}${C['CYN']}${F['UBE']}SNIPPED:${F['END']}\n"
+            OUTMSG+="\n${prfx}-> 06 lines of source from ${F['UBE']}${ECONT["source"]}${F['UEN']} <-\n"
+            OUTMSG+="${prfx}{\n"
+        else
+            prfx=">> "
+            OUTMSG+="\n>> SNIPPED:\n"
+            OUTMSG+="\n>> -> 06 lines of source from ${ECONT["source"]} <-\n"
+            OUTMSG+=">> {\n"
+        fi
 
-    regfile=${ECONT["source"]}
-    regex=$(awk 'NR>L-5 && NR<L+5 { printf "L:%-5d%3s%s\n",NR,(NR==L?">>>":""),$regfile }' L="${ECONT["line"]}" "${ECONT["source"]}")
+        regfile=${ECONT["source"]}
+        regex=$(awk 'NR>L-4 && NR<L+4 { printf "L:%-5d%3s%s\n",NR,(NR==L?">>>":""),$regfile }' L="${ECONT["line"]}" "${ECONT["source"]}")
                     
-    OUTMSG+="${regex}\n>> }\n"
+        if [ ${OUT_COLOR} == true ]; then
+            OUTMSG+="${regex}\n${prfx}${F['END']}}\n"
+        else
+            OUTMSG+="${regex}\n>> }\n"
+        fi
+}
+
+error_msg_color() {
+
+    # Set var(switch) to store bool
+    switch=${1}
+    
+    # Check if (var) is true, if yes colors will be enabled.
+    if [ "${switch}" == true ]; then
+        
+        OUT_COLOR=true
+        
+        # Declare an global associative array
+        declare -gA C                                   # color array
+        declare -gA F                                   # formating array
+
+        # Fill color array with values (tput command output)
+        C['BLK']="$(tput setaf 0)"
+        C+=(['RED']="$(tput setaf 1)" ['GRN']="$(tput setaf 2)" ['YEL']="$(tput setaf 3)" ['BLU']="$(tput setaf 4)")
+        C+=(['MAG']="$(tput setaf 5)" ['CYN']="$(tput setaf 6)" ['WHT']="$(tput setaf 7)")
+        C['END']="$(tput sgr0)"         # F['END'] can also be used.
+
+        # Fill formating array with values (tput command output)
+        F['BLD']="$(tput bold)"
+        F['UBE']="$(tput smul)"         # Underline BEgin
+        F['UEN']="$(tput rmul)"         # Underline ENd
+        F['DIM']="$(tput dim)"
+        F['END']="$(tput sgr0)"         # C['END'] can also be used.
+    
+    elif [ "${switch}" == false ]; then
+        
+        # Set color output false, destroy arrays.
+        OUT_COLOR=false
+        unset C F
+
+    fi
 
 }
+
 
 # Bash error library handler
 # This is an own self written error handler, to handle function
@@ -407,7 +475,19 @@ error_exit_clean() {
         fi
     
     dur=$(echo "$(date +%s.%N)"-"${MTSTART}" | node -p)
-    printf ">> Execution time: %.6f seconds\n" "${dur}"
+
+    if [ ${OUT_COLOR} == true ]; then
+        prfx="${C['RED']}>> ${F['END']}"
+        dur=$(printf "%0.6f" "${dur}")
+        echo -e "${prfx} ${F['DIM']}Execution time: ${dur} seconds${F['END']}\n"
+    else
+        prfx=">> "
+        echo -e "${prfx} Execution time: ${dur} seconds\n"
+        
+    fi
+
+    #echo -e "${prfx} Execution time: ${dur} seconds\n"
+    #printf "%s ${C['RED']} Execution time: %.6f seconds\n" "${prfx}" ""
     return 0
 }
 
@@ -421,14 +501,27 @@ error_exit_clean() {
 if [ ${DEBUG_AUTO} == true ]; then    
     # call debug function
     bs_debug auto
-else    
-    # check if arg is DEBUG_OPT
-    for i in "${@}"
-    do 
-        if [ "${i}" == "${DEBUG_OPT}" ];then    
-        # call debug function
-            bs_debug true
-        fi
-    done
-    
 fi
+
+if [ ${OUT_COLOR} == true ]; then    
+    # call color function
+    # load colors in array.
+    error_msg_color true
+fi
+
+
+# check if arg is DEBUG_OPT
+for i in "${@}"
+do 
+    if [ "${i}" == "${DEBUG_OPT}" ];then    
+    # call debug function
+        bs_debug true
+    fi
+
+    if [ "${i}" == "-c" ] || [ "${i}" == "--color" ]; then    
+        # call color function
+        # load colors in array.
+        error_msg_color true
+    fi 
+done
+
