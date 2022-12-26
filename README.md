@@ -14,7 +14,7 @@ This is an bash error "library", an error handler for any kind of bash script. T
 - error logging
 - debug logging
 - display stack
-- colors & themes
+- colors & (themes)
 - STANDALONE SINGLEFILE!
 
 ## Index
@@ -51,7 +51,7 @@ An trap, set in the begin of any kind of bash script, calls the error handler fu
 - [x] Option to enable/disable logging (file)
 - [x] Option to display errorstack
 - [x] Option to display source code snipped (from called error)
-- [x] Oprion to log in an error file
+- [x] Option to enable colors on output
 - [x] Option to enable debug (also via cmd option)
 
 
@@ -93,6 +93,7 @@ L:54      huhu
 iptoux@2040:~/gits/bash_error_lib$ 
 ```
 
+**DEBUG-LOG FILE**
 ```
 iptoux@2040:~/gits/bash_error_lib$ ./basherr.sh
 iptoux@2040:~/gits/bash_error_lib$ cat 12.15.22_1835637.log 
@@ -108,7 +109,7 @@ iptoux@2040:~/gits/bash_error_lib$ cat 12.15.22_1835637.log
 iptoux@2040:~/gits/bash_error_lib$ 
 ```
 
-**LOG**
+**ERROR-LOG FILE**
 ```
 >> Date/Time: 23.12.2022 - 23:44:38
 ------------------------------------------------
