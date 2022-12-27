@@ -234,9 +234,14 @@ error_merge_vars(){
 
 # This is the function to get and build stack
 error_stacktrace() {
-    
+
+    declare -a libfuncs
+
+    # Define an array that holds all library own function names, so they are excluded in stack call.
+    libfuncs=("bs_error_trap" "error_read_file" "bs_debug" "error_merge_vars" "error_stacktrace")
+
     #define local function vars
-    local frame=1 LINE SUB FILE prfx
+    local frame=0 LINE SUB FILE prfx
 
 
         if [ ${OUT_COLOR} == true ]; then
@@ -250,12 +255,18 @@ error_stacktrace() {
 
     # loop through frames (func calls)
     while read -r LINE SUB FILE < <(caller "${frame}"); do
-        if [ ${OUT_COLOR} == true ]; then
-            OUTMSG+="    ${SUB} @ ${FILE}:${LINE}\n"
+        
+        # Skip library own names in stack output.
+        if [[ ${libfuncs[*]} =~ ${SUB} ]]; then
+                ((frame++))
         else
-            OUTMSG+="    ${SUB} @ ${FILE}:${LINE}\n"
+            if [ ${OUT_COLOR} == true ]; then
+                OUTMSG+="    ${SUB} @ ${FILE}:${LINE}\n"
+            else
+                OUTMSG+="    ${SUB} @ ${FILE}:${LINE}\n"
+            fi
+            ((frame++))
         fi
-        ((frame++))
     done
 
 }
