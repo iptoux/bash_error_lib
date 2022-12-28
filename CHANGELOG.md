@@ -1,3 +1,18 @@
+#### 1.2.4 (2022-12-28)
+
+##### New Features
+
+* **library:**  Manual errors ([15218d69](https://github.com/iptoux/bash_error_lib/commit/15218d69fcdbcff6f8fe3a2dc1719e241be7a014))
+
+##### Other Changes
+
+* **version:**  Update version" ([4076c6ac](https://github.com/iptoux/bash_error_lib/commit/4076c6acc0a57f93833f14b36578a970a7c5274c))
+
+##### Refactors
+
+* **library:**  Update version ([14e0dc2f](https://github.com/iptoux/bash_error_lib/commit/14e0dc2f9885286f8179f3ca45a86ceef59b3b6b))
+* **version:**  Update version ([0747f8e0](https://github.com/iptoux/bash_error_lib/commit/0747f8e089bef3368348c37bf22fd08c84e5f9a0))
+
 ### 1.2.0 (2022-12-23)
 
 ##### Documentation Changes
