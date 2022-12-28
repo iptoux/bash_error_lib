@@ -9,12 +9,13 @@
     <img src="https://img.shields.io/github/package-json/keywords/iptoux/bash_error_lib?style=flat-square" title="GitHub package.json dynamic"> 
 </p>
 
-This is an bash error "library", an error handler for any kind of bash script. The library catches mostly all  script errors and syntax erros by an trap and displays/logs them. The library includes:
+This is an bash error "library", an error handler for any kind of bash script. The library catches mostly all errors by an trap and displays/logs them. The library includes:
 
 - error logging
 - debug logging
 - display stack
 - colors & (themes)
+- own manual manages
 - STANDALONE SINGLEFILE!
 
 ## Index
@@ -53,7 +54,7 @@ An trap, set in the begin of any kind of bash script, calls the error handler fu
 - [x] Option to display source code snipped (from called error)
 - [x] Option to enable colors on output
 - [x] Option to enable debug (also via cmd option)
-
+- [x] Option to set manual errors on any line.
 
 ## Screenshots/Output
 ---
@@ -172,6 +173,18 @@ L:54      huhu
 ---
 
 **IMAGES**
+
+- default error with color
+![default error with color](../assets/v1.2.4/color_default_error.png)
+
+- syntax error without color (also with possible)
+![syntax error without color](../assets/v1.2.4/nocolor_syntax_error.png)
+
+- manual error with color
+![manual error with color](../assets/v1.2.4/color_manual.png)
+
+- external error without color (also with possible)
+![external error without color](../assets/v1.2.4/nocolor_external.png)
 
 comming soon.
 
