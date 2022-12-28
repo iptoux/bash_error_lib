@@ -204,12 +204,11 @@ error_merge_vars(){
         ECONT["cause"]="${TARGS["func"]}"
     fi
     
-    if [ "${TARGS["file"]}" != "${FARGS["file"]}" ]; then
-        ECONT["source"]="${FARGS["file"]}"
-    elif [ "${FARGS["file"]}" != "${TARGS["file"]}" ]; then
+    
+    if [ "${FARGS["file"]}" != "${TARGS["file"]}" ]; then
         ECONT["source"]="${TARGS["file"]}"
     else
-        ECONT["source"]="${TARGS["file"]}"
+         ECONT["source"]="${FARGS["file"]}"
     fi
 
     # Match lines to get always the same
