@@ -204,9 +204,12 @@ error_merge_vars(){
         ECONT["cause"]="${TARGS["func"]}"
     fi
     
-    
     if [ "${FARGS["file"]}" != "${TARGS["file"]}" ]; then
-        ECONT["source"]="${TARGS["file"]}"
+        if [[ ${TARGS["file"]} =~ ${BASH_SOURCE[0]} ]]; then
+            ECONT["source"]="${FARGS["file"]}"
+        else
+            ECONT["source"]="${TARGS["file"]}"
+        fi
     else
          ECONT["source"]="${FARGS["file"]}"
     fi
