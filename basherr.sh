@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Bash error library            @version: 1.2.1
+# Bash error library            @version: 1.2.4
 # 
 # This is an example how the library can be used in an
 # script. Just source the library and setup the traps to
