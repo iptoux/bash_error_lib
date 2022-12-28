@@ -58,6 +58,7 @@ DEBUG_FILE=${LOG_DIR}${DATE}'_debug_'${DEBUG_PID}'.log'
 unset TARGS 
 unset FARGS
 unset ECONT
+unset EARGS
 
 ############ HANDLER VARS/SETS ############
 # Declaring all needed Container array's variables, lists
@@ -204,9 +205,9 @@ error_merge_vars(){
     fi
     
     if [ "${TARGS["file"]}" != "${FARGS["file"]}" ]; then
-        ECONT["source"]="${TARGS["file"]}"
-    elif [ "${FARGS["file"]}" != "${TARGS["file"]}" ]; then
         ECONT["source"]="${FARGS["file"]}"
+    elif [ "${FARGS["file"]}" != "${TARGS["file"]}" ]; then
+        ECONT["source"]="${TARGS["file"]}"
     else
         ECONT["source"]="${TARGS["file"]}"
     fi
@@ -501,6 +502,77 @@ error_exit_clean() {
     #printf "%s ${C['RED']} Execution time: %.6f seconds\n" "${prfx}" ""
     return 0
 }
+
+
+_error() {
+
+    # Fill ECONT container with args and user message...
+    ECONT["code"]="1"
+    ECONT["type"]="(M): ${BECD[${ECONT["code"]}]}"
+    
+    ECONT["msg"]=" ${1}\n"
+
+    ECONT["call"]=" N/A (see message)"
+    ECONT["cause"]="$(caller 0 | cut -d ' ' -f2)"
+    ECONT["source"]="$(caller 0 | cut -d ' ' -f3)"
+    ECONT["line"]="$(caller 0 | cut -d ' ' -f1)"
+
+    # Generate default output msg
+    error_out_msg
+    
+    # Check if file source snipped should be displayd
+    if [ "${ERROR_DISP_SNIPPED}" == true ]; then
+        error_read_src
+    fi
+
+    # Check if logging of errors in enabled.
+    if [ "${ERROR_LOG}" == true ]; then
+        error_out_log ""
+    fi
+
+    echo -e "${OUTMSG}"
+
+
+}
+
+
+# Function to call Error manualy 
+# Name is specily for short calling 
+# _log(){
+
+#     unset LARGS
+
+#     declare -A LARGS
+
+#     # Store passed vars
+#     EARGS["msg"]=${1}
+    
+#     if [[ -n ${2} ]]; then EARGS["type"]=${2}; fi
+
+
+#     # Check if type is given
+#     if [[ -v ${EARGS["type"]} ]]; then
+#             echo -e "\n${EARGS["msg"]}\n"
+#     else
+#         # convert short level to name
+#         case ${EARGS["type"]} in
+#             i)  etype="INFO";;
+#             w)  etype="WARN";;
+#             e)  etype="ERROR";;
+#             *)  etype="INFO";;
+#         esac
+#             echo "${etype}::${EARGS["msg"]}"
+#     fi
+
+#     # check for color mode
+
+        
+#     # check for log
+
+#     # check for exit?
+
+# }
+
 
 
 #### DONT #### EDIT #### DONT #### EDIT #### DONT #### EDIT #### DONT #### EDIT ##
