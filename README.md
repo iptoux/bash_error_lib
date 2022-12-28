@@ -58,8 +58,8 @@ An trap, set in the begin of any kind of bash script, calls the error handler fu
 ## Screenshots/Output
 ---
 
-**CLI**
-```
+**CLI-TRAP**
+```console
 iptoux@2040:~/gits/bash_error_lib$ ./basherr.sh 
 
 ------------------------------------------------
@@ -91,6 +91,36 @@ L:54      huhu
 >> There are 6 log files in folder, cleaning....
 >> Execution time: 0.322949 seconds
 iptoux@2040:~/gits/bash_error_lib$ 
+```
+
+**CLI-MANUAL**
+```console
+iptoux@2040:~/gits/bash_error_lib$ ./basherr.sh 
+
+------------------------------------------------
+>> ERROR (1) - (M): General/External script error.
+
+>> MSG: this is an random error
+>> CALL/CMD/ARG: N/A (see message)
+>> CAUSE BY: huhu IN: ./basherr.sh ON LINE: 50
+
+>> SNIPPED:
+
+>> -> 06 lines of source from ./basherr.sh <-
+>> {
+L:47      
+L:48      huhu() {
+L:49      
+L:50   >>>_error "this is an random error"
+L:51      
+L:52      }
+L:53      
+>> }
+
+>> There are 6 debug log files in folder, cleaning....
+>>  Execution time: 0.17364144325256348 seconds
+
+iptoux@2040:~/gits/bash_error_lib$
 ```
 
 **DEBUG-LOG FILE**
