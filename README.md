@@ -175,18 +175,22 @@ L:54      huhu
 **IMAGES**
 
 - default error with color
+
 ![default error with color](../assets/v1.2.4/color_default_error.png)
 
 - syntax error without color (also with possible)
+
 ![syntax error without color](../assets/v1.2.4/nocolor_syntax_error.png)
 
 - manual error with color
+
 ![manual error with color](../assets/v1.2.4/color_manual.png)
 
 - external error without color (also with possible)
+
 ![external error without color](../assets/v1.2.4/nocolor_external.png)
 
-comming soon.
+
 
 ## HowTo
 ---
