@@ -24,6 +24,7 @@ ERROR_EXIT=true
 ERROR_LOG=true
 ERROR_DISP_SNIPPED=true
 ERROR_DISP_STACK=true
+ERROR_ONELINE=true
 
 # Debug
 DEBUG_AUTO=false
@@ -253,6 +254,11 @@ error_stacktrace() {
             prfx="\n>> FULLSTACK:\n\n"
         fi
 
+    if [ "${ERROR_ONELINE}" == "true" ]; then
+        #skip here if onliner is active
+        return
+    fi
+
     # add blank line
     OUTMSG+="${prfx}"
 
@@ -278,6 +284,18 @@ error_stacktrace() {
 error_out_msg() {
 
     local prfx
+
+    if [ "${ERROR_ONELINE}" == "true" ]; then
+
+        prfx=">> "
+
+        # >> ERROR (1) -> MSG -> CALL -> by CAUSE in FILE on LINE
+
+        OUTMSG+="${prfx}ERROR (${ECONT["code"]}) -> ${ECONT["msg"]//\\n/} -> CMD: ${ECONT["call"]} by ${ECONT["cause"]} in ${ECONT["source"]} on/near line ${ECONT["line"]}"
+        OUTMSG+="\n"
+        
+        return
+    fi
 
     if [ ${OUT_COLOR} == true ]; then
         prfx="${C['RED']}>> ${F['END']}"
@@ -331,6 +349,11 @@ error_out_log() {
 error_read_src() {
 
     local prfx
+
+    if [ "${ERROR_ONELINE}" == "true" ]; then
+        #skip here if onliner is active
+        return
+    fi
 
     if [ ${OUT_COLOR} == true ]; then
             prfx="${C['RED']}>> ${F['END']}"
