@@ -285,15 +285,19 @@ error_out_msg() {
 
     local prfx
 
+    # Check if oneliner option is set.
     if [ "${ERROR_ONELINE}" == "true" ]; then
 
         prfx=">> "
 
+        # Remove new lines, just in case....
+        ECONT["msg"]=$(echo -n "${ECONT["msg"]}")
         # >> ERROR (1) -> MSG -> CALL -> by CAUSE in FILE on LINE
-
-        OUTMSG+="${prfx}ERROR (${ECONT["code"]}) -> ${ECONT["msg"]//\\n/} -> CMD: ${ECONT["call"]} by ${ECONT["cause"]} in ${ECONT["source"]} on/near line ${ECONT["line"]}"
-        OUTMSG+="\n"
         
+        OUTMSG+="${prfx}ERROR (${ECONT["code"]}) ->${ECONT["msg"]//\\n/} -> CMD:${ECONT["call"]} by ${ECONT["cause"]} in ${ECONT["source"]} on/near line ${ECONT["line"]}"
+        OUTMSG+="\n"
+
+        # Skip rest of function here.
         return
     fi
 

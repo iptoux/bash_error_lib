@@ -47,7 +47,8 @@ trap 'bs_error_trap "$?" "${BASH_SOURCE[0]}" "${LINENO}" "${FUNCNAME}"' EXIT
 
 huhu() {
 
-_error "this is an random error"
+cat lol
+#_error "this is an random error"
 
 }
 
